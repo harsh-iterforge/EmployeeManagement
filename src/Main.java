@@ -2,10 +2,13 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+        BankAccount companyAccount = new BankAccount(500000);
         PayrollSystem payroll = new PayrollSystem("TechCorp");
         Manager manager = new Manager("Harsh Sanjay Tuli", 8000, "Management");
         manager.setTeamSize(5);
         manager.setProjectBonus(2000);
+        manager.setProjectBonus("abc");
+        manager.setProjectBonus("-80");
 
         Developer dev1 = new Developer("Ankit Ramesh Pradhan", 6000, "Development", "Java", "Senior");
         dev1.completeProject();
@@ -56,5 +59,10 @@ public class Main {
         designer1.completeDesign("Graphic", 2);
         System.out.println("\nAfter completing additional projects/designs:");
         payroll.displayAllEmployees();
+
+
+        payroll.payAllEmployees(companyAccount);
+
+        System.out.println("Final Bank Balance: $" + companyAccount.getBalance());
     }
 }

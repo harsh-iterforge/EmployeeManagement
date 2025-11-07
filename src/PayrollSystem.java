@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 
 public class PayrollSystem {
     private List<Employee> employees = new ArrayList<>();
@@ -51,15 +54,31 @@ public class PayrollSystem {
     }
 
 
+
     public void displayAllEmployees() {
         System.out.println("===== Employee List (" + company + ") =====");
+
+        // Create a thread pool (3 threads here; you can tune this)
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+
         for (Employee e : employees) {
-            System.out.println("ID: " + e.getEmployeeId() +
-                    " | Name: " + e.getFullName() +
-                    " | Role: " + e.getRole() +
-                    " | Department: " + e.getDepartment() +
-                    String.format(" | Salary: $%.2f", e.calculateSalary()));
+            executor.submit(() -> {
+                String info = "ID: " + e.getEmployeeId() +
+                        " | Name: " + e.getFullName() +
+                        " | Role: " + e.getRole() +
+                        " | Department: " + e.getDepartment() +
+                        String.format(" | Salary: $%.2f", e.calculateSalary());
+
+                // Print with thread info for clarity
+                System.out.println(Thread.currentThread().getName() + " -> " + info);
+            });
         }
+
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+            // wait for all tasks to finish
+        }
+
         System.out.println("===========================================");
     }
 
@@ -81,4 +100,22 @@ public class PayrollSystem {
         report.append("=================================\n");
         return report.toString();
     }
+    public void payAllEmployees(BankAccount account) {
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+
+        for (Employee e : employees) {
+            executor.submit(() -> {
+                double salary = e.calculateSalary();
+                account.withdraw(salary, e.getFullName());
+            });
+        }
+
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+            // wait for all payments to finish
+        }
+
+        System.out.println("✅ All salaries processed!");
+    }
+
 }
